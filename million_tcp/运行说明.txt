@@ -1,0 +1,23 @@
+开一个服务器虚拟机：4G内存+2核CPU
+开N个客户端虚拟机：2G内存+1核CPU
+以上是最低配置。
+错误解决方法：
+1、文件系统进程数fd最大只能到1024（Connect refused）。
+解决办法：sudo vim /etc/security/limits.conf
+#End of file前添加：
+*	hard	nofile	1048576，
+*	soft	nofile	1048576。
+2、request address。
+解决方法：增加监听端口数，在代码中修改。
+3、connection timed out。
+解决方法：修改fd个数与fd的最大值：
+vim /etc/sysctl.conf
+fs.file-max = 1048576
+net.nf_conntrack_max = 1048576
+修改生效：sudo sysctl -p。
+4、内存不够。
+解决方法：修改内存协议栈，改善内存回收机制。
+vim /etc/sysctl.conf
+net.ipv4.tcp_mem = 252144 524288 786432
+net.ipv4.tcp_wmem = 1024 1024 2048
+net.ipv4.tcp_rmem = 1024 1024 2048
